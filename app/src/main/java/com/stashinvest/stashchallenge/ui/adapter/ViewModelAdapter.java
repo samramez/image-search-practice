@@ -68,4 +68,9 @@ public class ViewModelAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             viewTypeMap.put(baseViewModel.getViewType().getId(), baseViewModel);
         }
     }
+
+    public void clear() {
+        viewModels.clear();
+        notifyDataSetChanged();
+    }
 }

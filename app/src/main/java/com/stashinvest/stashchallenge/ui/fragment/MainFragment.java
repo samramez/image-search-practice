@@ -1,24 +1,31 @@
 package com.stashinvest.stashchallenge.ui.fragment;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
+import com.jakewharton.rxbinding2.widget.RxTextView;
 import com.stashinvest.stashchallenge.App;
 import com.stashinvest.stashchallenge.R;
-import com.stashinvest.stashchallenge.api.GettyImageService;
 import com.stashinvest.stashchallenge.api.model.ImageResponse;
 import com.stashinvest.stashchallenge.api.model.ImageResult;
 import com.stashinvest.stashchallenge.ui.adapter.ViewModelAdapter;
 import com.stashinvest.stashchallenge.ui.factory.GettyImageFactory;
+import com.stashinvest.stashchallenge.ui.search.SearchMvpView;
+import com.stashinvest.stashchallenge.ui.search.SearchPresenter;
 import com.stashinvest.stashchallenge.ui.viewmodel.BaseViewModel;
 import com.stashinvest.stashchallenge.util.SpaceItemDecoration;
 
@@ -31,28 +38,21 @@ import butterknife.BindDimen;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 import static android.view.View.GONE;
 
-public class MainFragment extends Fragment implements Callback<ImageResponse> {
+public class MainFragment extends Fragment implements SearchMvpView, TextView.OnEditorActionListener {
     @Inject
     ViewModelAdapter adapter;
     @Inject
-    GettyImageService gettyImageService;
-    @Inject
     GettyImageFactory gettyImageFactory;
+    @Inject
+    SearchPresenter searchPresenter;
 
-    @BindView(R.id.search_phrase)
-    EditText searchView;
-    @BindView(R.id.recycler_view)
-    RecyclerView recyclerView;
-    @BindView(R.id.progress_bar)
-    ProgressBar progressBar;
-    @BindDimen(R.dimen.image_space)
-    int space;
+    @BindView(R.id.search_phrase) EditText searchEditText;
+    @BindView(R.id.recycler_view) RecyclerView recyclerView;
+    @BindView(R.id.progress_bar) ProgressBar progressBar;
+    @BindDimen(R.dimen.image_space) int space;
 
     Unbinder unbinder;
 
@@ -72,17 +72,14 @@ public class MainFragment extends Fragment implements Callback<ImageResponse> {
         View view = inflater.inflate(R.layout.fragment_main, container, false);
         unbinder = ButterKnife.bind(this, view);
 
-        searchView.setOnEditorActionListener((v, actionId, event) -> {
-            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                search();
-                return true;
-            }
-            return false;
-        });
+        searchPresenter.attachView(this);
+        searchPresenter.search(RxTextView.textChanges(searchEditText));
+        searchEditText.setOnEditorActionListener(this);
 
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
         recyclerView.setAdapter(adapter);
         recyclerView.addItemDecoration(new SpaceItemDecoration(space, space, space, space));
+
         return view;
     }
 
@@ -90,31 +87,7 @@ public class MainFragment extends Fragment implements Callback<ImageResponse> {
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
-    }
-
-    @Override
-    public void onResponse(Call<ImageResponse> call, Response<ImageResponse> response) {
-        progressBar.setVisibility(GONE);
-
-        if (response.isSuccessful()) {
-            List<ImageResult> images = response.body().getImages();
-            updateImages(images);
-        } else {
-            //todo - show error
-        }
-    }
-
-    @Override
-    public void onFailure(Call<ImageResponse> call, Throwable t) {
-        progressBar.setVisibility(GONE);
-
-        //todo - show error
-    }
-
-    private void search() {
-        progressBar.setVisibility(View.VISIBLE);
-        Call<ImageResponse> call = gettyImageService.searchImages(searchView.getText().toString());
-        call.enqueue(this);
+        searchPresenter.detachView();
     }
 
     private void updateImages(List<ImageResult> images) {
@@ -128,5 +101,48 @@ public class MainFragment extends Fragment implements Callback<ImageResponse> {
 
     public void onImageLongPress(String id, String uri) {
         //todo - implement new feature
+    }
+
+    @Override
+    public void showError() {
+        Log.e("##", "showError()");
+        progressBar.setVisibility(GONE);
+        //todo - show error
+    }
+
+    @Override
+    public void showResults(ImageResponse response) {
+        Log.d("##", "showResults() -> images.size(): " + response.getImages().size());
+        progressBar.setVisibility(GONE);
+        List<ImageResult> images = response.getImages();
+        updateImages(images);
+    }
+
+    @Override
+    public void showLoading(boolean showLoading) {
+        Log.d("##", "showLoading()");
+        progressBar.setVisibility(showLoading ? View.VISIBLE : View.GONE);
+    }
+
+    @Override
+    public void showEmpty() {
+        Log.d("##", "showEmpty()");
+        progressBar.setVisibility(GONE);
+        adapter.clear();
+        // todo may have to delete this.
+    }
+
+    // TODO: Currently not working
+    @Override
+    public boolean onEditorAction(TextView view, int actionId, KeyEvent event) {
+        if (actionId ==  EditorInfo.IME_ACTION_SEND && event.getAction() == KeyEvent.ACTION_DOWN) {
+
+            if (view != null) {
+                InputMethodManager inputMethodManager =
+                        (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+            }
+        }
+        return true;
     }
 }

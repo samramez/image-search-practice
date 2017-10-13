@@ -3,6 +3,7 @@ package com.stashinvest.stashchallenge.injection;
 import android.content.Context;
 
 import com.google.gson.GsonBuilder;
+import com.jakewharton.retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import com.stashinvest.stashchallenge.R;
 import com.stashinvest.stashchallenge.api.GettyImageInterceptor;
 import com.stashinvest.stashchallenge.api.GettyImagesApi;
@@ -56,6 +57,7 @@ public class NetworkModule {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(context.getString(R.string.getty_base_url))
                 .addConverterFactory(gsonConverterFactory)
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .client(httpClient)
                 .build();
         return retrofit.create(GettyImagesApi.class);
