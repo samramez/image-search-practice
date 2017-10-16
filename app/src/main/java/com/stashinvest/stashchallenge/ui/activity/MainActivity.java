@@ -6,7 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 import com.stashinvest.stashchallenge.App;
 import com.stashinvest.stashchallenge.R;
 import com.stashinvest.stashchallenge.ui.fragment.MainFragment;
-import com.stashinvest.stashchallenge.ui.fragment.PopUpDialogFragment;
 
 public class MainActivity extends AppCompatActivity {
 

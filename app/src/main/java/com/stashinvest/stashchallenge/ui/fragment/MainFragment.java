@@ -24,6 +24,7 @@ import com.stashinvest.stashchallenge.api.model.ImageResponse;
 import com.stashinvest.stashchallenge.api.model.ImageResult;
 import com.stashinvest.stashchallenge.ui.adapter.ViewModelAdapter;
 import com.stashinvest.stashchallenge.ui.factory.GettyImageFactory;
+import com.stashinvest.stashchallenge.ui.fragment.popupdialog.PopUpDialogFragment;
 import com.stashinvest.stashchallenge.ui.search.SearchMvpView;
 import com.stashinvest.stashchallenge.ui.search.SearchPresenter;
 import com.stashinvest.stashchallenge.ui.viewmodel.BaseViewModel;
@@ -101,6 +102,8 @@ public class MainFragment extends Fragment implements SearchMvpView, TextView.On
 
     public void onImageLongPress(String id, String uri) {
         //todo - implement new feature
+        PopUpDialogFragment dialogFragment = PopUpDialogFragment.newInstance(id, uri);
+        dialogFragment.show(getActivity().getSupportFragmentManager(), PopUpDialogFragment.class.getSimpleName());
     }
 
     @Override
