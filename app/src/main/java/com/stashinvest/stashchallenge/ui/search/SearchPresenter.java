@@ -46,6 +46,7 @@ public class SearchPresenter extends BasePresenter<SearchMvpView> {
         RxUtils.disposeIfNeeded(disposable);
     }
 
+    // TODO: Replace RxJava side effects with an event object.
     public void search( Observable<CharSequence> textChangeObservable) {
         checkViewAttached();
         disposable = textChangeObservable
