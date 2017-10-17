@@ -16,10 +16,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
-/**
- * Created by samramezanli on 10/10/17.
- */
-
 public class SearchPresenter extends BasePresenter<SearchMvpView> {
 
     private static final int MIN_CHARACTER = 1;

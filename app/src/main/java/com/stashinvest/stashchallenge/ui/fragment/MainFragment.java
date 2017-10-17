@@ -16,6 +16,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.jakewharton.rxbinding2.widget.RxTextView;
 import com.stashinvest.stashchallenge.App;
@@ -42,7 +43,7 @@ import butterknife.Unbinder;
 
 import static android.view.View.GONE;
 
-public class MainFragment extends Fragment implements SearchMvpView, TextView.OnEditorActionListener {
+public class MainFragment extends Fragment implements SearchMvpView {
     @Inject
     ViewModelAdapter adapter;
     @Inject
@@ -75,7 +76,6 @@ public class MainFragment extends Fragment implements SearchMvpView, TextView.On
 
         searchPresenter.attachView(this);
         searchPresenter.search(RxTextView.textChanges(searchEditText));
-        searchEditText.setOnEditorActionListener(this);
 
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
         recyclerView.setAdapter(adapter);
@@ -108,9 +108,10 @@ public class MainFragment extends Fragment implements SearchMvpView, TextView.On
 
     @Override
     public void showError() {
-        Log.e("##", "showError()");
-        progressBar.setVisibility(GONE);
         //todo - show error
+        Log.e("##", "showError()");
+        Toast.makeText(getContext(), "Error loading images", Toast.LENGTH_LONG).show();
+        progressBar.setVisibility(GONE);
     }
 
     @Override
@@ -132,20 +133,6 @@ public class MainFragment extends Fragment implements SearchMvpView, TextView.On
         Log.d("##", "showEmpty()");
         progressBar.setVisibility(GONE);
         adapter.clear();
-        // todo may have to delete this.
     }
 
-    // TODO: Currently not working
-    @Override
-    public boolean onEditorAction(TextView view, int actionId, KeyEvent event) {
-        if (actionId ==  EditorInfo.IME_ACTION_SEND && event.getAction() == KeyEvent.ACTION_DOWN) {
-
-            if (view != null) {
-                InputMethodManager inputMethodManager =
-                        (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-                inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
-            }
-        }
-        return true;
-    }
 }
