@@ -1,53 +1,106 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
-
-    <ImageView
-        android:id="@+id/image_view"
-        android:layout_width="match_parent"
-        android:layout_height="160dp"
-        android:scaleType="centerCrop" />
-
-    <TextView
-        android:id="@+id/title_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        tools:text="Art by Artist" />
+    android:orientation="vertical"
+    android:padding="8dp"
+    >
 
     <LinearLayout
+        android:id="@+id/dialogLayout"
         android:layout_width="match_parent"
-        android:layout_height="112dp"
-        android:orientation="horizontal"
-        android:paddingTop="16dp">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="8dp"
+        android:visibility="visible"
+        >
 
         <ImageView
-            android:id="@+id/similar_image_view1"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:scaleType="centerCrop" />
+            android:id="@+id/image_view"
+            android:layout_width="match_parent"
+            android:layout_height="160dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/placeholder_grey"
+            />
 
+        <TextView
+            android:id="@+id/title_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:layout_margin="8dp"
+            tools:text="Image Title"
+            />
 
-        <ImageView
-            android:id="@+id/similar_image_view2"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:scaleType="centerCrop" />
+        <TextView
+            android:id="@+id/artist_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:textSize="16sp"
+            android:textStyle="italic"
+            android:layout_margin="4dp"
+            tools:text="Artist Name"
+            />
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="112dp"
+            android:orientation="horizontal"
+            android:paddingTop="16dp">
 
-        <ImageView
-            android:id="@+id/similar_image_view3"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:scaleType="centerCrop" />
+            <ImageView
+                android:id="@+id/similar_image_view1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:scaleType="centerCrop"
+                android:src="@drawable/placeholder_grey"
+                android:layout_margin="2dp"
+                />
+
+            <ImageView
+                android:id="@+id/similar_image_view2"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:scaleType="centerCrop"
+                android:src="@drawable/placeholder_grey"
+                android:layout_margin="2dp"
+                />
+
+            <ImageView
+                android:id="@+id/similar_image_view3"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:scaleType="centerCrop"
+                android:src="@drawable/placeholder_grey"
+                android:layout_margin="2dp"
+                />
+        </LinearLayout>
+
     </LinearLayout>
 
-</LinearLayout>
+    <FrameLayout
+        android:id="@+id/errorLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Error happened while loading"
+            android:layout_gravity="center"
+            android:textStyle="bold"
+            />
+    </FrameLayout>
+
+
+</FrameLayout>

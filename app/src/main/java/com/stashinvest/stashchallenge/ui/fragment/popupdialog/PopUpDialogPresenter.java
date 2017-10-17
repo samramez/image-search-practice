@@ -38,26 +38,45 @@ public class PopUpDialogPresenter extends BasePresenter<PopUpDialogMvpView> {
     }
 
 
-    public void getImageData(String id) {
+    void getImageData(String id) {
         checkViewAttached();
-        disposable = Observable.zip(getSimilarImagesObserbale(id),
-                getImageMetaDataObservable(id), Pair::new)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(responsePair -> {
-                    //todo: finsih metho.
-                });
+        disposable = Observable.zip(
+                        getSimilarImagesObservable(id),
+                        getImageMetaDataObservable(id),
+                        Pair::new)
+                    .subscribe(responsePair -> {
 
+                            getMvpView().showResult();
 
+                            if (responsePair.first != null) {
+                                getMvpView().onSuccessGettingImageData(responsePair.first);
+                            }
+
+                            if (responsePair.second != null) {
+                                getMvpView().onSuccessGettingMetaData(responsePair.second);
+                            }
+                        },
+                            error -> getMvpView().showError(error.getMessage())
+                    );
     }
 
-    private Observable<ImageResponse> getSimilarImagesObserbale(String id) {
-        return gettyImageService.getSimilarImages(id);
-                //.onErrorReturn(t -> ); //todo: return empty image response.
+    private Observable<ImageResponse> getSimilarImagesObservable(String id) {
+        return gettyImageService.getSimilarImages(id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .onErrorReturn(t -> {
+                    getMvpView().showError(t.getMessage());
+                    return new ImageResponse();
+                });
     }
 
     private Observable<MetadataResponse> getImageMetaDataObservable(String id) {
-        return gettyImageService.getImageMetadata(id);
-                //.onErrorReturn();
+        return gettyImageService.getImageMetadata(id)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .onErrorReturn(t -> {
+                    getMvpView().showError(t.getMessage());
+                    return new MetadataResponse();
+                });
     }
 }
