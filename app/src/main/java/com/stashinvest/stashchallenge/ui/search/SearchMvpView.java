@@ -15,5 +15,5 @@ public interface SearchMvpView extends MvpView {
 
     void showLoading(boolean showLoading);
 
-    void showEmpty();
+    void showEmpty(boolean showEmpty);
 }

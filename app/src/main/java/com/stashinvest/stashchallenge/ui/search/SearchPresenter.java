@@ -4,7 +4,9 @@ package com.stashinvest.stashchallenge.ui.search;
 import android.util.Log;
 
 import com.stashinvest.stashchallenge.api.GettyImageService;
+import com.stashinvest.stashchallenge.api.model.ImageResponse;
 import com.stashinvest.stashchallenge.ui.base.BasePresenter;
+import com.stashinvest.stashchallenge.ui.viewmodel.SubmitUiEvent;
 import com.stashinvest.stashchallenge.util.RxUtils;
 
 import java.util.concurrent.TimeUnit;
@@ -43,31 +45,46 @@ public class SearchPresenter extends BasePresenter<SearchMvpView> {
     }
 
     // TODO: Replace RxJava side effects with an event object.
-    public void search( Observable<CharSequence> textChangeObservable) {
+    public void search(Observable<CharSequence> textChangeObservable) {
         checkViewAttached();
         disposable = textChangeObservable
-                .doOnNext(query ->  {
+                /*.doOnNext(query ->  {
                     if (query.length() == 0) {
                         getMvpView().showEmpty();
                     }
-                })
-                .filter(charSequence -> charSequence.length() >= MIN_CHARACTER)
-                .doOnNext(ignore ->  getMvpView().showLoading(true))
+                })*/
+                //.filter(charSequence -> charSequence.length() >= MIN_CHARACTER)
+                //.doOnNext(ignore ->  getMvpView().showLoading(true))
                 .debounce(MIN_TIME, TimeUnit.MILLISECONDS)
                 .switchMap(query ->
+                        gettyImageService.searchImages(query.toString())
+                                .map(SubmitUiEvent::success)
+                                .onErrorReturn(t -> SubmitUiEvent.error(t.getMessage()))
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .startWith(SubmitUiEvent.inProgress()))
+/*                .switchMap(query ->
                         query.length() != 0
-                        ? gettyImageService.searchImages(query.toString())
-                        .onErrorResumeNext(Observable.empty())
-                : Observable.empty())
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                            ? gettyImageService.searchImages(query.toString())
+                                    .map(SubmitUiEvent::success)
+                                    .onErrorReturn(t -> SubmitUiEvent.error(t.getMessage()))
+                                    .subscribeOn(Schedulers.io())
+                                    .observeOn(AndroidSchedulers.mainThread())
+                                    .startWith(SubmitUiEvent.inProgress())
+                            : Observable.empty())*/
                 .subscribe(response -> {
-                    Log.d("##", "successful response");
+
+
+                    getMvpView().showLoading(response.isProgress());
+                    getMvpView().showEmpty(response.isShowEmpty());
+
+
+                    /*Log.d("##", "successful response");
                     if (response != null || !response.getImages().isEmpty()) {
                         getMvpView().showResults(response);
                     } else {
                         getMvpView().showEmpty();
-                    }
+                    }*/
                 }, error -> {
                     Log.e("##", "error getting result: " + error);
                     getMvpView().showError();
